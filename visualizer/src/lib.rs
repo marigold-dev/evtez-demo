@@ -1,3 +1,5 @@
+#![feature(let_else)]
+
 #[global_allocator]
 static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
 
@@ -21,10 +23,10 @@ extern "C" {
 struct Candle {
     // block height
     time: u64,
-    low: u64,
-    high: u64,
-    open: u64,
-    close: u64,
+    low: f64,
+    high: f64,
+    open: f64,
+    close: f64,
 }
 
 fn draw_all<B>(b: B, ticks: &[Candle]) -> Result<()>
@@ -51,7 +53,7 @@ where
         .x_label_area_size(40)
         .y_label_area_size(40)
         .caption("Price", ("sans-serif", 10.0).into_font())
-        .build_cartesian_2d(0..ticks.len(), low..high + 1)?;
+        .build_cartesian_2d(0..ticks.len(), low..high + 1.)?;
     chart.configure_mesh().light_line_style(&WHITE).draw()?;
 
     chart.draw_series(ticks.iter().enumerate().map(
@@ -83,7 +85,7 @@ where
 
 pub struct Tick {
     time: u64,
-    price: u64,
+    price: f64,
 }
 
 fn aggregate(data: &mut [Tick], interval: u64) -> Vec<Candle> {
@@ -167,10 +169,35 @@ impl ContractEventListener {
                             console_log!("but we are not interested in {tag}");
                             return;
                         }
-                        let price = if let Some(price) = data.as_u64() {
-                            price
+                        let price = if let Some(price) = data
+                            .as_object()
+                            .and_then(|o| o.get("args"))
+                            .and_then(|a| a.as_array())
+                        {
+                            let Some(ev_xtz) = price
+                                .get(0)
+                                .and_then(|v| v.as_object())
+                                .and_then(|v| v.get("int"))
+                                .and_then(|v| v.as_str())
+                                .and_then(|v| v.parse::<f64>().ok())
+                            else {
+                                console_log!("{data:?} is not a price tick, no ev_xtz");
+                                return;
+                            };
+
+                            let Some(xtz) = price
+                                .get(1)
+                                .and_then(|v| v.as_object())
+                                .and_then(|v| v.get("int"))
+                                .and_then(|v| v.as_str())
+                                .and_then(|v| v.parse::<f64>().ok())
+                            else {
+                                console_log!("{data:?} is not a price tick, no xtz");
+                                return;
+                            };
+                            ev_xtz / xtz
                         } else {
-                            console_log!("{data:?} is not a price");
+                            console_log!("{data:?} is not a price tick");
                             return;
                         };
                         console_log!("xrate: emitter: {emitter}");
