@@ -25,14 +25,21 @@ fail_op(){
    usage
 }
 
+make_out_dir(){
+  mkdir -p out
+}
+
+
 build_storage() {
     echo "Compiling liquid storage"
+    make_out_dir
     ligo compile contract contract/src/liquid.mligo -e  liquid_main -s cameligo -o out/liquid.tz
 }
 
 build_contract(){
     echo "Compiling liquid contract"
-    INITSTORAGE=$(<src/storage/initial_storage.mligo)
+    make_out_dir
+    INITSTORAGE=$(<contract/src/storage/initial_storage.mligo)
     ligo compile storage contract/src/liquid.mligo "$INITSTORAGE" -s cameligo  -e  liquid_main -o out/liquid-storage.tz
 }
 
