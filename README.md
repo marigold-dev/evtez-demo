@@ -91,31 +91,16 @@ Ligo doesn't currently support event emission so that compiled Michelson code ne
              INT ;
              ISNAT ;
              IF_NONE
-               { PUSH string "This is the emission function" ; FAILWITH }
+               { DROP; PUSH string "This is the emission function" ; FAILWITH }
                { DROP ; UNIT } } ;
 ```
 
 The `(pair nat nat)` is the liquid exchange rate that needs to be emited.  This can be accomplished with the following:
 
 ```Michelson
-PUSH nat ???; PUSH string "xrate"; EMIT
+EMIT %xrate
 ```
-
-This needs to be patched in between the first `APPLY;` and the callsite of the lambda `LAMBDA` so the patched code should look like the following:
-
-```Michelson
-         APPLY ;
-         PUSH nat ???; PUSH string "xrate"; EMIT
-         LAMBDA
-           (pair nat nat)
-           unit
-           { CDR ;
-             INT ;
-             ISNAT ;
-             IF_NONE
-               { PUSH string "This is the emission function" ; FAILWITH }
-               { DROP ; UNIT } } ;
-```
+Replace `DROP; PUSH string "This is the emission function" ; FAILWITH` with the code above.
 
 Once the compiled code has been patched it can then be deployed.
 

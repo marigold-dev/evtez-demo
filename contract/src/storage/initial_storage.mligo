@@ -1,6 +1,6 @@
 {
   treasury = {
-    addr = ("tz1iAUh2mga5rHX8RwdqgyZCDKESwLtsAngg" : address);
+    addr = ("tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb" : address);
     value = 1n;
   };
   allocation = {

@@ -40,7 +40,6 @@
               glibc
               cmake
               ligo
-              tezos
               crate2nix
               nixfmt
               rustup

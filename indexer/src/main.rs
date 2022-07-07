@@ -1,4 +1,4 @@
-#![feature(let_else)]
+#![feature(let_else, result_option_inspect)]
 use std::{fmt::Debug, net::SocketAddr, time::Duration};
 
 use anyhow::{bail, Result};
@@ -6,6 +6,7 @@ use clap::Parser;
 use futures::{pin_mut, prelude::*};
 use hyper::{Client, StatusCode, Uri};
 use serde::{Deserialize, Serialize};
+use serde_json::Value as JsonValue;
 use tracing::{error, info};
 use warp::{ws::Message, Filter};
 
@@ -45,7 +46,92 @@ struct Event {
     emitter: String,
     payer: String,
     tag: String,
-    data: serde_json::Value,
+    data: JsonValue,
+    #[serde(rename = "type")]
+    ty: JsonValue,
+}
+
+#[derive(Deserialize)]
+struct TezBlock {
+    #[serde(default)]
+    operations: Vec<JsonValue>,
+}
+
+#[derive(Deserialize)]
+struct TezOperation {
+    #[serde(default)]
+    contents: Vec<TezOperationContent>,
+}
+
+#[derive(Deserialize)]
+#[serde(tag = "kind", rename_all = "snake_case")]
+enum TezOperationContent {
+    Transaction {
+        metadata: TezTransactionOperationMetadata,
+        destination: String,
+    },
+    Reveal,
+    Origination,
+    Delegation,
+    RegisterGlobalConstant,
+    SetDepositsLimit,
+    IncreasePaidStorage,
+    TxRollupOrigination,
+    TxRollupSubmitBatch,
+    TxRollupCommit,
+    TxRollupReturnBond,
+    TxRollupFinalizeCommitment,
+    TxRollupRemoveCommitment,
+    TxRollupRejection,
+    TxRollupDispatchTickets,
+    TransferTicket,
+    ScRollupOriginate,
+    ScRollupAddMessages,
+    ScRollupCement,
+    ScRollupPublish,
+    ScRollupRefute,
+    ScRollupTimeout,
+    ScRollupExecuteOutboxMessage,
+    ScRollupRecoverBond,
+    ScRollupDalSlotSubscribe,
+    DalPublishSlotHeader,
+    Endorsement,
+    Preendorsement,
+    DalSlotAvailability,
+    SeedNonceRelevation,
+    VdfRelevation,
+    DoubleEndorsementEvidence,
+    DoublePreendorsementEvidence,
+    DoubleBakingEvidence,
+    ActivateAccount,
+    Proposals,
+    Ballot,
+    FailingNoop,
+}
+
+#[derive(Deserialize)]
+struct TezTransactionOperationMetadata {
+    #[serde(default)]
+    internal_operation_results: Vec<TezInternalOperationResult>,
+}
+
+#[derive(Deserialize)]
+#[serde(tag = "kind", rename_all = "snake_case")]
+enum TezInternalOperationResult {
+    /// event
+    Event {
+        #[serde(rename = "type")]
+        ty: JsonValue,
+        source: String,
+        tag: Option<String>,
+        payload: JsonValue,
+    },
+    /// transaction, but we do not care
+    Transaction,
+    /// origination, but we do not care
+    Origination,
+    /// delegation, but we do not care
+    Delegation,
 }
 
 async fn poll_block_for_event(node: SocketAddr, level: u64) -> Result<Vec<Event>> {
@@ -61,40 +147,23 @@ async fn poll_block_for_event(node: SocketAddr, level: u64) -> Result<Vec<Event>
         StatusCode::OK => {
             let body = hyper::body::to_bytes(res).await?;
             let val: serde_json::Value = serde_json::from_slice(&body)?;
-            let Some(val) = val.as_object() else { bail!("expected object") };
+            let val = TezBlock::deserialize(&val)?;
             let mut events = vec![];
-            let Some(operations) = val.get("operations").and_then(|ops| ops.as_array()) else { return Ok(events) };
-            let Some(operations) = operations.get(3).and_then(|ops| ops.as_array()) else { return Ok(events) };
+            let Some(operations) = val.operations.get(3) else { return Ok(events) };
+            let operations = Vec::<TezOperation>::deserialize(operations)
+                .inspect_err(|e| error!(?e, "TezOperation"))?;
             for op in operations {
-                let Some(op) = op.as_object() else { continue };
-                let Some(contents) = op.get("contents").and_then(|contents| contents.as_array()) else { continue };
-                for content in contents {
-                    let Some(content) = content.as_object() else { continue };
-                    let Some(metadata) = content.get("metadata").and_then(|metadata| metadata.as_object()) else { continue };
-                    let Some(operation_result) = metadata.get("operation_result").and_then(|result| result.as_object()) else { continue };
-                    let Some(evs) = operation_result.get("events").and_then(|events| events.as_array()) else { continue };
-                    let payer = content
-                        .get("source")
-                        .and_then(|source| source.as_str())
-                        .unwrap_or("");
-                    let emitter = content
-                        .get("destination")
-                        .and_then(|source| source.as_str())
-                        .unwrap_or("");
-                    for event in evs {
-                        let Some(event) = event.as_object() else { continue };
-                        let tag = event
-                            .get("tag")
-                            .and_then(|tag| tag.as_str())
-                            .unwrap_or("")
-                            .to_owned();
-                        let Some(data) = event.get("data") else { continue };
+                for content in op.contents {
+                    let TezOperationContent::Transaction { destination, metadata, .. } = content else { continue };
+                    for event in metadata.internal_operation_results {
+                        let TezInternalOperationResult::Event { ty, source, tag, payload } = event else { continue };
                         events.push(Event {
                             level,
-                            payer: payer.to_owned(),
-                            emitter: emitter.to_owned(),
-                            data: data.clone(),
-                            tag,
+                            payer: source.clone(),
+                            emitter: destination.clone(),
+                            data: payload,
+                            tag: tag.unwrap_or_else(|| "default".into()),
+                            ty,
                         });
                     }
                 }

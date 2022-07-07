@@ -78,7 +78,10 @@ type AppState = {
 class App extends React.Component<{}, AppState> {
     constructor(props: {}) {
         super(props);
-        this.state = {};
+        this.state = {
+            contractInput: "",
+            nodeInput: "",
+        };
     }
 
     track() {
