@@ -2,3 +2,5 @@
 **/node_modules
 visualizer/pkg
 visualizer/dist
+.vscode
+**/result

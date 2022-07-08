@@ -4,10 +4,23 @@ const webpack = require('webpack');
 const WasmPackPlugin = require("@wasm-tool/wasm-pack-plugin");
 
 module.exports = {
-    entry: './index.js',
+    entry: './index.tsx',
     output: {
         path: path.resolve(__dirname, 'dist'),
         filename: 'index.js',
+    },
+    devtool: "inline-source-map",
+    module: {
+        rules: [
+            {
+                test: /\.tsx?$/,
+                use: 'ts-loader',
+                exclude: /node_modules/,
+            },
+        ],
+    },
+    resolve: {
+        extensions: ['.tsx', '.ts', '.js'],
     },
     plugins: [
         new HtmlWebpackPlugin({
@@ -16,10 +29,6 @@ module.exports = {
         new WasmPackPlugin({
             crateDirectory: path.resolve(__dirname, ".")
         }),
-        // new webpack.ProvidePlugin({
-        //     TextDecoder: ['text-encoding', 'TextDecoder'],
-        //     TextEncoder: ['text-encoding', 'TextEncoder']
-        // })
     ],
     mode: 'development',
     experiments: {

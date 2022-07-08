@@ -8,7 +8,7 @@ use plotters::prelude::*;
 use plotters_canvas::CanvasBackend;
 use serde::Deserialize;
 use wasm_bindgen::{prelude::*, JsCast};
-use web_sys::{console::log_1, HtmlCanvasElement, MessageEvent, WebSocket};
+use web_sys::{console::log_2, HtmlCanvasElement, MessageEvent, WebSocket};
 
 macro_rules! console_log {
     ($($t:tt)*) => (::web_sys::console::log_1(&::wasm_bindgen::JsValue::from_str(&format_args!($($t)*).to_string())))
@@ -127,14 +127,13 @@ fn aggregate(data: &mut [Tick], interval: u64) -> Vec<Candle> {
 pub struct ContractEventListener {
     contract: String,
     socket: WebSocket,
-    on_message: Closure<dyn FnMut(MessageEvent)>,
+    _on_message: Closure<dyn FnMut(MessageEvent)>,
 }
 
 #[derive(Debug, Deserialize)]
 struct Event {
     level: u64,
     emitter: String,
-    payer: String,
     tag: String,
     data: serde_json::Value,
 }
@@ -212,8 +211,16 @@ impl ContractEventListener {
         Ok(Self {
             contract: contract.into(),
             socket,
-            on_message,
+            _on_message: on_message,
         })
+    }
+}
+
+impl Drop for ContractEventListener {
+    fn drop(&mut self) {
+        if let Err(e) = self.socket.close() {
+            log_2(&JsValue::from_str("error on closing socket:"), &e);
+        }
     }
 }
 
@@ -232,7 +239,7 @@ pub fn observe_price(
     interval: u64,
     canvas: HtmlCanvasElement,
 ) -> Result<ContractEventListener, JsValue> {
-    log_1(&JsValue::from_str("observe_price"));
+    console_log!("observe_price");
     let mut ticks = vec![];
     let on_event = move |tick| {
         let backend = if let Some(b) = CanvasBackend::with_canvas_object(canvas.clone()) {

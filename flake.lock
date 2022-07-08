@@ -2,11 +2,11 @@
   "nodes": {
     "flake-utils": {
       "locked": {
-        "lastModified": 1649676176,
-        "narHash": "sha256-OWKJratjt2RW151VUlJPRALb7OU2S5s+f0vLj4o1bHM=",
+        "lastModified": 1656928814,
+        "narHash": "sha256-RIFfgBuKz6Hp89yRr7+NR5tzIAbn52h8vT6vXkYjZoM=",
         "owner": "numtide",
         "repo": "flake-utils",
-        "rev": "a4b154ebbdc88c8498a5c7b01589addc9e9cb678",
+        "rev": "7e2a3b3dfd9af950a856d66b0a7d01e3c18aa249",
         "type": "github"
       },
       "original": {
@@ -17,11 +17,11 @@
     },
     "flake-utils_2": {
       "locked": {
-        "lastModified": 1637014545,
-        "narHash": "sha256-26IZAc5yzlD9FlDT54io1oqG/bBoyka+FJk5guaX4x4=",
+        "lastModified": 1656065134,
+        "narHash": "sha256-oc6E6ByIw3oJaIyc67maaFcnjYOz1mMcOtHxbEf9NwQ=",
         "owner": "numtide",
         "repo": "flake-utils",
-        "rev": "bba5dcc8e0b20ab664967ad83d24d64cb64ec4f4",
+        "rev": "bee6a7250dd1b01844a2de7e02e4df7d8a0a206c",
         "type": "github"
       },
       "original": {
@@ -32,11 +32,11 @@
     },
     "nixpkgs": {
       "locked": {
-        "lastModified": 1651726670,
-        "narHash": "sha256-dSGdzB49SEvdOJvrQWfQYkAefewXraHIV08Vz6iDXWQ=",
+        "lastModified": 1657020478,
+        "narHash": "sha256-sU5hXEGcOcvz2xoPAuNLBQJLXjwvPpTkoddyXE8gw20=",
         "owner": "nixos",
         "repo": "nixpkgs",
-        "rev": "c777cdf5c564015d5f63b09cc93bef4178b19b01",
+        "rev": "71a4f0dc3d80ba76f437c888c1c3d59f1df98163",
         "type": "github"
       },
       "original": {
@@ -48,11 +48,11 @@
     },
     "nixpkgs_2": {
       "locked": {
-        "lastModified": 1637453606,
-        "narHash": "sha256-Gy6cwUswft9xqsjWxFYEnx/63/qzaFUwatcbV5GF/GQ=",
+        "lastModified": 1656401090,
+        "narHash": "sha256-bUS2nfQsvTQW2z8SK7oEFSElbmoBahOPtbXPm0AL3I4=",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "8afc4e543663ca0a6a4f496262cd05233737e732",
+        "rev": "16de63fcc54e88b9a106a603038dd5dd2feb21eb",
         "type": "github"
       },
       "original": {
@@ -76,11 +76,11 @@
         "nixpkgs": "nixpkgs_2"
       },
       "locked": {
-        "lastModified": 1652064227,
-        "narHash": "sha256-ZpIfELJNVzcxa6+YUr1KfbpTkHh02FASdlHaCC5/Q6w=",
+        "lastModified": 1657075953,
+        "narHash": "sha256-xVgbASGI/wODPpUiMexxZau+XDVOZMBbFmw2KsZyFKA=",
         "owner": "oxalica",
         "repo": "rust-overlay",
-        "rev": "31db726b18ad2620fead6e7cd31b6e57d1cd061b",
+        "rev": "339de634e6f19e420e81d5a6acaa39364a726999",
         "type": "github"
       },
       "original": {
@@ -96,20 +96,55 @@
         ],
         "nixpkgs": [
           "nixpkgs"
-        ]
+        ],
+        "tezos_release": "tezos_release",
+        "tezos_trunk": "tezos_trunk"
       },
       "locked": {
-        "lastModified": 1651298115,
-        "narHash": "sha256-rx04L4x9LXvmJe29ba3mrd9gmQQ4jwN1mf6XJq7Yq/g=",
+        "lastModified": 1656683762,
+        "narHash": "sha256-ckZYVPgyCTuwJZqPRptMMX2nBo3zMSh7Nx7enJfOJ7g=",
         "owner": "marigold-dev",
         "repo": "tezos-nix",
-        "rev": "e4b40b5088a4991a677c77629462f2152f7d32ce",
+        "rev": "cb59263407a451eeb4b8e4064c8837bccf4c2e4e",
         "type": "github"
       },
       "original": {
         "owner": "marigold-dev",
         "repo": "tezos-nix",
         "type": "github"
+      }
+    },
+    "tezos_release": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1651744524,
+        "narHash": "sha256-AEY/m3c+6Yo/gqzO+4vzExQ20ICleIUsSFO1qWTO/OI=",
+        "owner": "tezos",
+        "repo": "tezos",
+        "rev": "cb9f439e58c761e76ade589d1cdbd2abb737dc68",
+        "type": "gitlab"
+      },
+      "original": {
+        "owner": "tezos",
+        "ref": "v13.0",
+        "repo": "tezos",
+        "type": "gitlab"
+      }
+    },
+    "tezos_trunk": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1656577193,
+        "narHash": "sha256-k1wzmuXVY7rm45zkNznLEXeaqM8v789Kzam0xaoXvlI=",
+        "owner": "tezos",
+        "repo": "tezos",
+        "rev": "3829de24b026457d4e6995c21484849e1972f26d",
+        "type": "gitlab"
+      },
+      "original": {
+        "owner": "tezos",
+        "repo": "tezos",
+        "type": "gitlab"
       }
     }
   },
