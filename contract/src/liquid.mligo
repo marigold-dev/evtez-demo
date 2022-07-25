@@ -89,7 +89,7 @@ let create_token_if_required (s : liquid_storage) : liquid_storage =
       let after_token_creation = create_evtez_token s in
       mint_to_treasury (base_treasury_tokens, after_token_creation)
     else
-     s
+      s
 
 (* Validates the amount of evXTZ to be redeemed*)
 let validate_redemption ( amount_to_redeem, storage : nat * liquid_storage ) : nat =
@@ -107,11 +107,11 @@ let validate_redemption ( amount_to_redeem, storage : nat * liquid_storage ) : n
 
 (* Calculates the amount of evXTZ to be minted from the required XTZ that is being deposited *)
 let get_amount_to_mint ( a, r : nat * exchange_rate) : nat =
-    (a / r.xtz) * r.evxtz
+    a * r.evxtz / r.xtz
 
 (* Calculates the amount of XTZ to be removed from the treasury due to the amount of evXTZ being burned / redeemed *)
 let get_amount_to_remove_from_treasury ( a, r : nat * exchange_rate) : nat =
-    (a / r.evxtz) * r.xtz
+    a * r.xtz / r.evxtz
 
 
 (* Transfers 'XTZ' to treasury  *)
@@ -122,10 +122,8 @@ let transfer_to_treasury (a, s: nat * liquid_storage) : liquid_storage =
 
 (* Removes 'XTZ' from treasury  *)
 let remove_from_treasury (a, s: nat * liquid_storage) : liquid_storage =
-    let treasury_after_transfer =  { s.treasury with value = abs (s.treasury.value - a) } in
+    let treasury_after_transfer = { s.treasury with value = abs (s.treasury.value - a) } in
     { s with treasury = treasury_after_transfer }
-
-
 
 (* Fake underlying staking rewards to make the fx event more interesting *)
 let adjust_deposit (treasury_amount, deposit_amount: nat * nat)

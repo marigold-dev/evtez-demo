@@ -54,7 +54,7 @@ Usage of the do script is:
 1. To get a dev shell, run the following from the root of the project
 
 ```bash
-nix developer
+nix develop
 ```
 
 ## Building

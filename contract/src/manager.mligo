@@ -64,11 +64,13 @@ let validate_burn_amount (s, n: nat * nat) : nat =
     if new_supply < 0  then
       (failwith insufficient_balance : nat)
     else
-     abs (new_supply)
+      abs (new_supply)
 
 let burn_update_total_supply (txs, total_supplies
     : (mint_burn_tx list) * token_total_supply) : token_total_supply =
-  let update = fun (supplies, tx : token_total_supply * mint_burn_tx) -> validate_burn_amount (supplies, tx.amount) in
+  let update (supplies, tx : token_total_supply * mint_burn_tx) : nat =
+    validate_burn_amount (supplies, tx.amount)
+  in
   List.fold update txs total_supplies
 
 let burn_tokens (param, storage : mint_burn_tx_param * token_storage)
