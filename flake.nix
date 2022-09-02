@@ -40,12 +40,7 @@
               glibc
               cmake
               ligo
-              crate2nix
               nixfmt
-              rustup
-              cargo
-              cargo-watch
-              wasm-pack
             ];
           shellHook = ''
             alias lcc="ligo compile contract"
@@ -63,11 +58,6 @@
             inherit system;
             overlays = [ (import rust-overlay) rustOverlay ];
           };
-          indexer = let cargoNix = import ./Cargo.nix { inherit pkgs; };
-          in cargoNix.workspaceMembers.indexer.build;
-
-          visualizer = let cargoNix = import ./Cargo.nix { inherit pkgs; };
-          in cargoNix.workspaceMembers.visualizer.build;
 
           contract = pkgs.stdenv.mkDerivation {
             name = "liquid";
