@@ -33,7 +33,7 @@ let inc_balance (owner, amt, ledger
 let dec_balance (owner, amt, ledger
     : address * nat * ledger) : ledger =
   let bal = get_balance_amt (owner, ledger) in
-  match Michelson.is_nat (bal - amt) with
+  match is_nat (bal - amt) with
   | None -> (failwith insufficient_balance : ledger)
   | Some new_bal ->
     if new_bal = 0n
@@ -55,7 +55,7 @@ let transfer (txs, validate_op, storage
         if not Big_map.mem dst.token_id storage.token_metadata
         then (failwith token_undefined : ledger)
         else
-          let _u = validate_op (tx.from_, Tezos.sender,  storage.operators) in
+          let _u = validate_op (tx.from_, Tezos.get_sender (),  storage.operators) in
           let lll = dec_balance (tx.from_, dst.amount, ll) in
           inc_balance(dst.to_,  dst.amount, lll)
       ) tx.txs l
