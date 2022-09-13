@@ -46,7 +46,7 @@ let validate_update_operators_by_owner (update, updater : update_operator * addr
  *)
 let fa2_update_operators (updates, storage
     : (update_operator list) * operator_storage) : operator_storage =
-  let updater = Tezos.sender in
+  let updater = Tezos.get_sender () in
   let process_update = (fun (ops, update : operator_storage * update_operator) ->
     let _u = validate_update_operators_by_owner (update, updater) in
     update_operators (update, ops)
@@ -103,6 +103,6 @@ let validate_operator (tx_policy, txs, ops_storage
   let validator = make_operator_validator tx_policy in
   List.iter (fun (tx : transfer) ->
     List.iter (fun (_dst: transfer_destination) ->
-      validator (tx.from_, Tezos.sender ,ops_storage)
+      validator (tx.from_, Tezos.get_sender () ,ops_storage)
     ) tx.txs
   ) txs

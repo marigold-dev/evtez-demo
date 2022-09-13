@@ -49,7 +49,7 @@ type liquid_param =
   | Redeem of nat
 
 (* Event emission *)
-let emit_event ( e : event ) : operation =
+let emit_event ( _e : event ) : operation =
     failwith "This is the emission function"
 
 
@@ -93,7 +93,7 @@ let create_token_if_required (s : liquid_storage) : liquid_storage =
 
 (* Validates the amount of evXTZ to be redeemed*)
 let validate_redemption ( amount_to_redeem, storage : nat * liquid_storage ) : nat =
-    let sender_address : address = Tezos.sender in
+    let sender_address : address = Tezos.get_sender () in
     let ledger = storage.allocation.ledger in
     let found : nat option=  Big_map.find_opt (sender_address) ledger in
     match found with
@@ -148,7 +148,7 @@ let deposit (n, s : nat * liquid_storage)
     let adj = adjust_deposit (s.treasury.value, n) in
     let updated_treasury_storage = transfer_to_treasury (adj, after_token_creation) in
     let amount_to_mint : nat = get_amount_to_mint (adj, fx) in
-    let token_mint : mint_burn_tx = { owner = Tezos.sender; amount = amount_to_mint } in
+    let token_mint : mint_burn_tx = { owner = Tezos.get_sender (); amount = amount_to_mint } in
     let minted_tokens_storage = mint_tokens ([ token_mint  ], updated_treasury_storage.allocation) in
     let final_storage = { updated_treasury_storage with allocation = minted_tokens_storage  } in
     ([event], final_storage)
@@ -166,7 +166,7 @@ let redeem (n, s : nat * liquid_storage)
     let event = emit_event (Xtz_exchange_rate fx) in
     let amount_to_remove : nat = get_amount_to_remove_from_treasury (n, fx) in
     let updated_treasury_storage = remove_from_treasury (amount_to_remove, s) in
-    let token_mint : mint_burn_tx = { owner = Tezos.sender; amount = n } in
+    let token_mint : mint_burn_tx = { owner = Tezos.get_sender (); amount = n } in
     let burned_tokens_storage = burn_tokens ([ token_mint  ], s.allocation) in
     let final_storage = { updated_treasury_storage with allocation = burned_tokens_storage  } in
     ([event], final_storage)
