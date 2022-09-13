@@ -6,6 +6,12 @@
 2. `rustup toolchain install nightly`
 3. `cargo install wasm-pack`
 4. Get your Flextesa Alphabox running, shipped with alpha protocol having event support, serving at port 20000 by default
+    - It is recommended to run it with `docker`
+    ```
+    docker run --rm --name my-sandbox --detach -p 20000:20000 \
+       -e block_time=3 \
+       oxheadalpha/flextesa kathmandubox start
+    ```
 4. Start with indexer
     - `(cd indexer; cargo run -- 127.0.0.1:2000 <indexer-port-of-your-choosing>)`
 5. Start the visualizer
