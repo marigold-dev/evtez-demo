@@ -83,30 +83,3 @@ nix build .#contract
 ```
 All build outputs will be found under `result/`
 
-
-# Patching the Michelson code
-
-Ligo doesn't currently support event emission so that compiled Michelson code needs to be adjusted to emit the events correctly.  In the resulting compiled code for the liquid contract `liquid.tz` there is a string marker to help narrow down the place that needs to be amended.  In the code one can look for a string "This is the emission function".  The surrounding code should be of the following format:
-
-```Michelson
-         APPLY ;
-         LAMBDA
-           (pair nat nat)
-           unit
-           { CDR ;
-             INT ;
-             ISNAT ;
-             IF_NONE
-               { DROP; PUSH string "This is the emission function" ; FAILWITH }
-               { DROP ; UNIT } } ;
-```
-
-The `(pair nat nat)` is the liquid exchange rate that needs to be emited.  This can be accomplished with the following:
-
-```Michelson
-EMIT %xrate
-```
-Replace `DROP; PUSH string "This is the emission function" ; FAILWITH` with the code above.
-
-Once the compiled code has been patched it can then be deployed.
-
