@@ -4,3 +4,4 @@ visualizer/pkg
 visualizer/dist
 .vscode
 **/result
+out

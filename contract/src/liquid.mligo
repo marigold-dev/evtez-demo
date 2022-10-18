@@ -49,8 +49,8 @@ type liquid_param =
   | Redeem of nat
 
 (* Event emission *)
-let emit_event ( _e : event ) : operation =
-    failwith "This is the emission function"
+let emit_event ( e : event ) : operation =
+    Tezos.emit "%xrate" e
 
 
 (* Calculate the current exchange rate from the current information in the treasury and the token storage *)

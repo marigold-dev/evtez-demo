@@ -33,7 +33,7 @@ make_out_dir(){
 build_storage() {
     echo "Compiling liquid storage"
     make_out_dir
-    ligo compile contract contract/src/liquid.mligo -e  liquid_main -s cameligo -o out/liquid.tz
+    ligo compile contract contract/src/liquid.mligo -e  liquid_main -s cameligo -o out/liquid.tz --protocol kathmandu
 }
 
 build_contract(){
